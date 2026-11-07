@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garment Cost BD &#x2014; RMG Costing &amp; FOB Calculator</title>
+<meta name="description" content="Offline bilingual EN/Bangla RMG garment costing tool: fabric consumption, cost sheet, FOB price per piece and order totals.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div>
+    <h1 data-i18n="appTitle">Garment Cost BD</h1>
+    <p class="sub" data-i18n="appSub">RMG costing &amp; FOB price calculator &#x2014; offline, no sign-in</p>
+  </div>
+  <button id="langToggle" type="button" class="lang">&#x9ac;&#x9be;&#x982;&#x9b2;&#x9be;</button>
+</header>
+
+<main>
+  <div id="errBanner" class="banner error" hidden></div>
+  <div id="msg" class="banner ok" hidden></div>
+
+  <section class="card">
+    <h2 data-i18n="secGarment">1 &#xb7; Garment &amp; fabric</h2>
+    <div class="grid">
+      <label><span data-i18n="preset">Garment preset</span>
+        <select id="preset"></select>
+      </label>
+      <p class="note full" data-i18n="presetNote">Presets are typical starting values only &#x2014; always match your buyer tech pack.</p>
+      <label><span data-i18n="bodyLen">Body length (cm)</span>
+        <input id="bodyLen" type="number" min="20" max="150" step="0.5" value="70"></label>
+      <label><span data-i18n="sleeveLen">Sleeve length (cm)</span>
+        <input id="sleeveLen" type="number" min="0" max="100" step="0.5" value="22"></label>
+      <label><span data-i18n="chest">Chest / hip width (cm)</span>
+        <input id="chest" type="number" min="20" max="200" step="0.5" value="52"></label>
+      <label><span data-i18n="fabricWidth">Fabric width (cm)</span>
+        <input id="fabricWidth" type="number" min="100" max="220" step="1" value="150"></label>
+      <label><span data-i18n="gsm">Fabric GSM</span>
+        <input id="gsm" type="number" min="80" max="600" step="1" value="180"></label>
+      <label><span data-i18n="wastage">Wastage (%)</span>
+        <input id="wastage" type="number" min="0" max="25" step="0.5" value="5"></label>
+      <label><span data-i18n="priceMode">Fabric price by</span>
+        <select id="priceMode"></select></label>
+      <label><span data-i18n="priceValue">Fabric price</span>
+        <input id="priceValue" type="number" min="0" step="0.01" value="220"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="secConsumption">2 &#xb7; Fabric consumption</h2>
+    <dl class="results">
+      <div><dt data-i18n="lengthReq">Length required</dt><dd id="outLengthReq">&#x2014;</dd></div>
+      <div><dt data-i18n="widthReq">Width required</dt><dd id="outWidthReq">&#x2014;</dd></div>
+      <div><dt data-i18n="consumption">Consumption / pc</dt><dd id="outConsumption">&#x2014;</dd></div>
+      <div><dt data-i18n="consumptionW">With wastage / pc</dt><dd id="outConsumptionW">&#x2014;</dd></div>
+      <div><dt data-i18n="weightPc">Fabric weight / pc</dt><dd id="outWeight">&#x2014;</dd></div>
+      <div><dt data-i18n="fabricCostPc">Fabric cost / pc</dt><dd id="outFabricCost">&#x2014;</dd></div>
+    </dl>
+    <p class="note" data-i18n="formulaNote">Estimate: (body + sleeve + 6 cm) &#xd7; (chest + 4 cm) &#xf7; fabric width. Rectangular-cut estimate &#x2014; not a marker plan.</p>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="secCost">3 &#xb7; Cost sheet (per piece)</h2>
+    <h3 data-i18n="trims">Trims &amp; accessories</h3>
+    <table class="trims">
+      <thead><tr>
+        <th data-i18n="trimName">Item</th>
+        <th data-i18n="trimQty">Qty</th>
+        <th data-i18n="trimPrice">Unit price</th>
+        <th><span class="sr">Delete</span></th>
+      </tr></thead>
+      <tbody id="trimsBody"></tbody>
+    </table>
+    <button id="addTrim" type="button" class="btn secondary" data-i18n="addTrim">+ Add trim</button>
+    <div class="grid">
+      <label><span data-i18n="cm">CM &#x2014; cutting &amp; making</span>
+        <input id="cm" type="number" min="0" step="0.01" value="45"></label>
+      <label><span data-i18n="washing">Washing</span>
+        <input id="washing" type="number" min="0" step="0.01" value="12"></label>
+      <label><span data-i18n="printEmb">Print / embroidery</span>
+        <input id="printEmb" type="number" min="0" step="0.01" value="8"></label>
+      <label><span data-i18n="freight">Freight &amp; handling</span>
+        <input id="freight" type="number" min="0" step="0.01" value="5"></label>
+      <label><span data-i18n="overheadPct">Overhead (%)</span>
+        <input id="overheadPct" type="number" min="0" max="100" step="0.5" value="5"></label>
+      <label><span data-i18n="profitPct">Profit margin (%)</span>
+        <input id="profitPct" type="number" min="0" max="100" step="0.5" value="10"></label>
+    </div>
+  </section>
+
+  <section class="card highlight">
+    <h2 data-i18n="secResult">4 &#xb7; Price per piece</h2>
+    <dl class="results big">
+      <div><dt data-i18n="trimsTotal">Trims total</dt><dd id="outTrimsTotal">&#x2014;</dd></div>
+      <div><dt data-i18n="subtotal">Subtotal</dt><dd id="outSubtotal">&#x2014;</dd></div>
+      <div><dt data-i18n="overhead">Overhead</dt><dd id="outOverhead">&#x2014;</dd></div>
+      <div><dt data-i18n="totalCost">Total cost / pc</dt><dd id="outTotalCost">&#x2014;</dd></div>
+      <div><dt data-i18n="profit">Profit / pc</dt><dd id="outProfit">&#x2014;</dd></div>
+      <div class="hero"><dt data-i18n="fob">FOB price / pc</dt><dd id="outFob">&#x2014;</dd></div>
+      <div><dt data-i18n="perDozen">FOB per dozen</dt><dd id="outPerDozen">&#x2014;</dd></div>
+    </dl>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="secOrder">5 &#xb7; Order totals</h2>
+    <div class="grid">
+      <label><span data-i18n="qty">Order quantity (pcs)</span>
+        <input id="qty" type="number" min="1" max="1000000" step="1" value="5000"></label>
+    </div>
+    <dl class="results">
+      <div><dt data-i18n="totalFabricM">Total fabric needed</dt><dd id="outTotalFabricM">&#x2014;</dd></div>
+      <div><dt data-i18n="totalFabricKg">Total fabric weight</dt><dd id="outTotalFabricKg">&#x2014;</dd></div>
+      <div><dt data-i18n="totalCostOrder">Total cost</dt><dd id="outTotalCostOrder">&#x2014;</dd></div>
+      <div><dt data-i18n="totalValue">Total FOB value</dt><dd id="outTotalValue">&#x2014;</dd></div>
+      <div><dt data-i18n="totalProfit">Total profit</dt><dd id="outTotalProfit">&#x2014;</dd></div>
+    </dl>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="secSaved">Saved cost sheets</h2>
+    <div class="save-row">
+      <input id="sheetName" type="text" maxlength="60" data-i18n-ph="sheetName" placeholder="Sheet name">
+      <button id="saveSheet" type="button" class="btn" data-i18n="saveSheet">Save this sheet</button>
+      <button id="loadSample" type="button" class="btn secondary" data-i18n="loadSample">Load sample sheet</button>
+    </div>
+    <ul id="savedList" class="saved"></ul>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="secData">Data</h2>
+    <div class="btn-row">
+      <button id="exportJson" type="button" class="btn secondary" data-i18n="exportJson">Export JSON</button>
+      <button id="importJson" type="button" class="btn secondary" data-i18n="importJson">Import JSON</button>
+      <input id="importFile" type="file" accept="application/json,.json" hidden>
+      <button id="eraseAll" type="button" class="btn danger" data-i18n="eraseAll">Erase all data</button>
+    </div>
+  </section>
+
+  <footer>
+    <p data-i18n="disclaimer">Estimation tool for RMG costing practice. Figures are estimates from your inputs &#x2014; always confirm with the buyer tech pack, marker plan and actual supplier quotes before quoting a price.</p>
+    <p class="muted">Garment Cost BD &#xb7; offline &#xb7; no data leaves your device</p>
+  </footer>
+</main>
+
+<script src="js/logic.js"></script>
+<script src="js/presets.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
